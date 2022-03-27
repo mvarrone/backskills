@@ -72,7 +72,7 @@ async def create_payable(payable: Payable):
     return create_payable_in_db(payable.dict())
 
 
-@ app.get("/unpaid-list/", status_code=201, tags=["Payable"])
+@ app.get("/unpaid-list/", status_code=200, tags=["Payable"])
 async def get_unpaid_list():
     """
     Get an unpaid payable list
@@ -85,7 +85,7 @@ async def get_unpaid_list():
     return get_unpaid_payable_list()
 
 
-@ app.get("/unpaid-list-by-service-type/{service_type}", status_code=201, tags=["Payable"])
+@ app.get("/unpaid-list-by-service-type/{service_type}", status_code=200, tags=["Payable"])
 async def get_unpaid_list_by_service_type(service_type: str):
     """
     Get an unpaid payable list by service_type
@@ -103,7 +103,7 @@ async def get_unpaid_list_by_service_type(service_type: str):
     return result
 
 
-@ app.put("/pay-tax/", status_code=200, tags=["Transaction"])
+@ app.put("/pay-tax/", status_code=201, tags=["Transaction"])
 async def make_transaction(transaction: Transaction):
     """
     Make a pay
@@ -124,7 +124,7 @@ async def make_transaction(transaction: Transaction):
     return make_transfer(transaction.dict())
 
 
-@ app.get("/get-transaction-list/", status_code=201, tags=["Transaction"])
+@ app.get("/get-transaction-list/", status_code=200, tags=["Transaction"])
 async def get_transaction_list(start_date: date, final_date: date):
     """
     Get a transaction list between 2 dates given
