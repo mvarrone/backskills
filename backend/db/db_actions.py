@@ -1,4 +1,3 @@
-import json
 import os
 import sqlite3
 
@@ -21,10 +20,10 @@ def create_payable_in_db(payable_fields):
     try:
         c.execute(
             "INSERT INTO payableinfo VALUES \
-            (:type, :descr, :due_date, :amount, :payment_status, :barcode, :paymentmethod, :cardnumber, :amountpaid, :paydate)",
+            (:service_type, :description, :due_date, :amount, :payment_status, :barcode, :paymentmethod, :cardnumber, :amountpaid, :paydate)",
             {
-                'type': payable_fields["type"],
-                'descr': payable_fields["descr"],
+                'service_type': payable_fields["service_type"],
+                'description': payable_fields["description"],
                 'due_date': payable_fields["due_date"],
                 'amount': payable_fields["amount"],
                 'payment_status': payable_fields["payment_status"],
@@ -46,7 +45,9 @@ def create_payable_in_db(payable_fields):
         conn.commit()
         conn.close
 
-    return {"Status": "Payable registered successfully"}
+    return {
+        "Status": "Payable registered successfully"
+    }
 
 
 def update_payable(transaction_fields, amount_in_db):
@@ -66,7 +67,8 @@ def update_payable(transaction_fields, amount_in_db):
 
     c = conn.cursor()
 
-    c.execute("""
+    c.execute(
+        """
     UPDATE payableinfo
     SET payment_status = :payment_status,
     amount = :amount,
@@ -75,16 +77,16 @@ def update_payable(transaction_fields, amount_in_db):
     amount_paid = :amount_paid,
     pay_date = :pay_date
     WHERE barcode = ?""",
-              (
-                  payable_status,
-                  amount_in_db - transaction_fields["amount"],
-                  transaction_fields["pay_method"],
-                  card_number,
-                  transaction_fields["amount"],
-                  transaction_fields["paid_date"],
-                  transaction_fields["barcode"]
-              )
-              )
+        (
+            payable_status,
+            amount_in_db - transaction_fields["amount"],
+            transaction_fields["pay_method"],
+            card_number,
+            transaction_fields["amount"],
+            transaction_fields["paid_date"],
+            transaction_fields["barcode"]
+        )
+    )
 
     conn.commit()
 
@@ -107,9 +109,9 @@ def make_transfer(transaction_fields):
 
     conn.close()
 
-    # print("\n", db_list)
-
-    headers = ["barcode", "amount"]
+    headers = [
+        "barcode", "amount"
+    ]
     resultado = []
     for _, barcode in enumerate(db_list):
         resultado.append(dict(zip(headers, list(barcode))))
@@ -139,13 +141,13 @@ def get_unpaid_payable_list():
     status = "pending"
 
     db_list = c.execute(
-        "SELECT type, due_date, amount, barcode FROM payableinfo where payment_status = ?", (status,)).fetchall()
+        "SELECT service_type, due_date, amount, barcode FROM payableinfo where payment_status = ?", (status,)).fetchall()
 
     conn.close()
 
-    # print("\n", db_list)
-
-    headers = ["type", "due_date", "amount", "barcode"]
+    headers = [
+        "type", "due_date", "amount", "barcode"
+    ]
     resultado = []
     for _, element in enumerate(db_list):
         resultado.append(dict(zip(headers, list(element))))
@@ -161,13 +163,13 @@ def get_unpaid_payable_list_by_type(service_type):
     status = "pending"
 
     db_list = c.execute(
-        "SELECT due_date, amount, barcode FROM payableinfo where payment_status = ? AND type = ?", (status, service_type)).fetchall()
+        "SELECT due_date, amount, barcode FROM payableinfo where payment_status = ? AND service_type = ?", (status, service_type)).fetchall()
 
     conn.close()
 
-    # print("\n", db_list)
-
-    headers = ["due_date", "amount", "barcode"]
+    headers = [
+        "due_date", "amount", "barcode"
+    ]
     resultado = []
     for _, element in enumerate(db_list):
         resultado.append(dict(zip(headers, list(element))))
@@ -189,52 +191,39 @@ def get_list_between_dates(start_date, final_date):
 
     conn.close()
 
-    # print("\n", db_list)
-
-    headers = ["pay_date", "amount_paid", "counter"]
+    headers = [
+        "pay_date", "amount_paid", "counter"
+    ]
     resultado = []
     for _, element in enumerate(db_list):
         resultado.append(dict(zip(headers, list(element))))
 
-    # print("\nresultado = ")
-    # print(resultado)
-    # print(type(resultado))
-    # print(len(resultado))
-    # print("\n")
-
     date_list = []
     for _, date in enumerate(resultado):
-        # print(date)
         if date["pay_date"] not in date_list:
             date_list.append(date["pay_date"])
 
-    # print("\ndate_list = ")
-    # print(date_list)
-    # print(len(date_list))
-    # print(type(date_list))
-
     dictionary = {}
-    lista_para_contador = []
-
-    contador = 0
-    acum = 0
-    for idx, element in enumerate(date_list):
-        for idx2, element2 in enumerate(resultado):
-            # print(resultado[idx2]["amount_paid"])
-            # print(date_list[idx])
-            # print(resultado[idx2]["pay_date"])
+    counter = 0
+    accumulator = 0
+    result_list = []
+    for idx, _ in enumerate(date_list):
+        for idx2, _ in enumerate(resultado):
             if date_list[idx] == resultado[idx2]["pay_date"]:
-                contador = contador + 1
-                acum = acum + resultado[idx2]["amount_paid"]
-                # print(resultado[idx2]["amount_paid"])
+                counter += 1
+                accumulator += resultado[idx2]["amount_paid"]
         dictionary = {
             "date": date_list[idx],
-            "number_of_transactions": contador,
-            "amount_accumulated": acum
+            "transaction_number_per_day": counter,
+            "accumulated_amount_per_day": accumulator
         }
-        lista_para_contador.append(dictionary)
-        # print(json.dumps(lista_para_contador, indent=2))
-        contador = 0
-        acum = 0
+        result_list.append(dictionary)
+        counter = accumulator = 0
 
-    return lista_para_contador
+    if len(result_list) == 0:
+        return {
+            "Status": "No transactions",
+            "transaction_number_per_day": 0,
+            "accumulated_amount_per_day": 0
+        }
+    return result_list[::-1]

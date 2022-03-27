@@ -18,8 +18,8 @@ def create_db_for_payables():
     c = conn.cursor()
 
     c.execute("""CREATE TABLE payableinfo (
-        type TEXT,
-        descr TEXT,
+        service_type TEXT,
+        description TEXT,
         due_date TEXT,
         amount REAL,
         payment_status TEXT,
