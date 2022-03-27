@@ -24,3 +24,5 @@ Backend implemented using FastAPI, Python3 and sqlite3
       py main.py
 
 - Test REST API visiting FastAPI Documentation: http://localhost:5001/docs
+
+- Check db using, e.g., DB Browser for SQLite, downloadable at: https://sqlitebrowser.org/
