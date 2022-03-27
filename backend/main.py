@@ -139,6 +139,7 @@ async def get_transaction_list(start_date: date, final_date: date):
     """
     return get_list_between_dates(start_date, final_date)
 
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",

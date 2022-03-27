@@ -141,7 +141,8 @@ def get_unpaid_payable_list():
     status = "pending"
 
     db_list = c.execute(
-        "SELECT service_type, due_date, amount, barcode FROM payableinfo where payment_status = ?", (status,)).fetchall()
+        "SELECT service_type, due_date, amount, barcode \
+            FROM payableinfo where payment_status = ?", (status,)).fetchall()
 
     conn.close()
 
@@ -204,16 +205,15 @@ def get_list_between_dates(start_date, final_date):
             date_list.append(date["pay_date"])
 
     dictionary = {}
-    counter = 0
-    accumulator = 0
+    counter = accumulator = 0
     result_list = []
-    for idx, _ in enumerate(date_list):
-        for idx2, _ in enumerate(resultado):
-            if date_list[idx] == resultado[idx2]["pay_date"]:
+    for i, _ in enumerate(date_list):
+        for j, _ in enumerate(resultado):
+            if date_list[i] == resultado[j]["pay_date"]:
                 counter += 1
-                accumulator += resultado[idx2]["amount_paid"]
+                accumulator += resultado[j]["amount_paid"]
         dictionary = {
-            "date": date_list[idx],
+            "date": date_list[i],
             "transaction_number_per_day": counter,
             "accumulated_amount_per_day": accumulator
         }
