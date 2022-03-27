@@ -1,4 +1,4 @@
-# Challenge
+# Backend challenge
 
 Backend implemented using FastAPI, Python3 and sqlite3
 
