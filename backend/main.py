@@ -51,7 +51,7 @@ app.add_middleware(
 
 
 @ app.post("/create-tax/", status_code=201, tags=["Payable"])
-async def create_payable(payable: Payable):
+async def create_payable(payable: Payable) -> dict:
     """
     Create payable
 
@@ -73,7 +73,7 @@ async def create_payable(payable: Payable):
 
 
 @ app.get("/unpaid-list/", status_code=200, tags=["Payable"])
-async def get_unpaid_list():
+async def get_unpaid_list() -> list:
     """
     Get an unpaid payable list
 
@@ -86,7 +86,7 @@ async def get_unpaid_list():
 
 
 @ app.get("/unpaid-list-by-service-type/{service_type}", status_code=200, tags=["Payable"])
-async def get_unpaid_list_by_service_type(service_type: str):
+async def get_unpaid_list_by_service_type(service_type: str) -> list:
     """
     Get an unpaid payable list by service_type
 
@@ -104,7 +104,7 @@ async def get_unpaid_list_by_service_type(service_type: str):
 
 
 @ app.put("/pay-tax/", status_code=201, tags=["Transaction"])
-async def make_transaction(transaction: Transaction):
+async def make_transaction(transaction: Transaction) -> dict:
     """
     Make a pay
 
